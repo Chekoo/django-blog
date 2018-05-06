@@ -52,22 +52,22 @@ class PostDetailView(DetailView):
         return context
 
 
-def detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    post.increase_views()  # 阅读量+1
-    post.body = markdown.markdown(post.body,
-                                  extensions=[
-                                      'markdown.extensions.extra',
-                                      'markdown.extensions.codehilite',
-                                      'markdown.extensions.toc',
-                                  ])
-    form = CommentForm()
-    comment_list = post.comment_set.all()
-    context = {'post': post,
-               'form': form,
-               'comment_list': comment_list
-               }
-    return render(request, 'blog/detail.html', context=context)
+# def detail(request, pk):
+#     post = get_object_or_404(Post, pk=pk)
+#     post.increase_views()  # 阅读量+1
+#     post.body = markdown.markdown(post.body,
+#                                   extensions=[
+#                                       'markdown.extensions.extra',
+#                                       'markdown.extensions.codehilite',
+#                                       'markdown.extensions.toc',
+#                                   ])
+#     form = CommentForm()
+#     comment_list = post.comment_set.all()
+#     context = {'post': post,
+#                'form': form,
+#                'comment_list': comment_list
+#                }
+#     return render(request, 'blog/detail.html', context=context)
 
 # 归档页面函数
 class ArchivesView(ListView):
