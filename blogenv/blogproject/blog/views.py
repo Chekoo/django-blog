@@ -19,12 +19,18 @@ class IndexView(ListView):
     def get_context_data(self, **kwargs):
         # 视图函数中将模板变量传给模板是通过render函数的context传递一个字典实现的
         # 在类视图中，这个需要传递的模板变量是通过get_context_data获得的，所以重写该方法，让我们能插入一些我们自定义的模板变量进去
+        # 首先获得父类生成的传递给模板的字典
         context = super().get_context_data(**kwargs)
+        # 父类生成的字典已含有paginator, page, is_paginated
         paginator = context.get('paginator')
         page = context.get('page_obj')
         is_paginated = context.get('is_paginated')
+        # 调用自己写的pagination_data方法获得分页导航条需要的数据
         pagination_data = self.pagination_data(paginator, page, is_paginated)
+        # 将分页导航条的模板变量更新到context中，注意pagination_data返回的也是一个字典
         context.update(pagination_data)
+        # 将更新后的context返回，以便ListView使用这个字典中的模板变量去渲染模板
+        # context字典中此时已经有了显示分页导航条所需的数据
         return context
 
     def pagination_data(self, paginator, page, is_paginated):
@@ -32,24 +38,34 @@ class IndexView(ListView):
             return {}
         left = []
         right = []
+        # 标示第1页页码后是否需要显示省略号
         left_has_more = False
         right_has_more = False
         first = False
         last = False
+        # 获得用户当前请求的页码号
         page_number = page.number
+        # 获得分页后的总页数
         total_pages = paginator.num_pages
+        # 获得整个分页页码列表，比如分4页，[1, 2, 3, 4]
         page_range = paginator.page_range
 
         if page_number == 1:
+            # 若请求第1页数据，此时只要获取当前页右边的连续页码号，比如分页页码列表是[1,2,3,4]获取的是right = [2,3]
             right = page_range[page_number:page_number + 2]
+            # 如果最右边页码号比最后1页的页码好减去1还要小，说明最右边
             if right[-1] < total_pages - 1:
                 right_has_more = True
+            # 如果最右边页码
             if right[-1] < total_pages:
                 last = True
         elif page_number == total_pages:
+            # 如果用户请求的是最后一页的数据，此时只要获取当前页左边的连续页码号。
             left = page_range[(page_number - 3) if (page_number - 3) > 0 else 0:page_number - 1]
+            # 如果最左边的页码比第2页的页码号大，则需要省略号
             if left[0] > 2:
                 left_has_more = True
+            # 如果最左边页码比第1页大，则第一页页码号需要显示
             if left[0] > 1:
                 first = True
         else:
@@ -59,7 +75,6 @@ class IndexView(ListView):
                 right_has_more = True
             if right[-1] < total_pages:
                 last = True
-
             if left[0] > 2:
                 left_has_more = True
             if left[0] > 1:
@@ -132,7 +147,7 @@ class PostDetailView(DetailView):
 #     return render(request, 'blog/detail.html', context=context)
 
 # 归档页面函数
-class ArchivesView(ListView):
+class ArchivesView(IndexView):
     model = Post
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
