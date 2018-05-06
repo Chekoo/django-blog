@@ -8,15 +8,20 @@ from django.views.generic import ListView
 
 # Create your views here.
 # 主页函数
+
 class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
 
+# def index(request):
+#     post_list = Post.objects.all()
+#     return render(request, 'blog/index.html', context={'post_list': post_list})
+
 # 详细页面函数
 def detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post.increase_views()
+    post.increase_views()  # 阅读量+1
     post.body = markdown.markdown(post.body,
                                   extensions=[
                                       'markdown.extensions.extra',
@@ -32,11 +37,23 @@ def detail(request, pk):
     return render(request, 'blog/detail.html', context=context)
 
 # 归档页面函数
-def archives(request, year, month):
-    post_list = Post.objects.filter(created_time__year = year,
-                                    created_time__month = month
-                                    ).order_by('-created_time')
-    return render(request, 'blog/index.html', context={'post_list': post_list})
+class ArchivesView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
+
+    def get_queryset(self):
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        return super(ArchivesView, self).get_queryset().filter('created_time__year = year,'
+                                                               'created_time__month = month'
+                                                               )
+
+# def archives(request, year, month):
+#     post_list = Post.objects.filter(created_time__year = year,
+#                                     created_time__month = month
+#                                     ).order_by('-created_time')
+#     return render(request, 'blog/index.html', context={'post_list': post_list})
 
 # 分类页面函数
 class CategoryView(IndexView):
@@ -48,3 +65,9 @@ class CategoryView(IndexView):
     def get_queryset(self):
         cate = get_object_or_404(Category, pk=self.kwargs.get('pk'))
         return super(CategoryView, self).get_queryset().filter(category=cate)
+
+
+# def category(request, pk):
+#     cate = get_object_or_404(Category, pk=pk)
+#     post_list = Post.objects.filter(category=cate)
+#     return render(request, 'blog/index.html', context={'post_list': post_list})
