@@ -14,6 +14,7 @@ def index(request):
 # 详细页面函数
 def detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
+    post.increase_views()
     post.body = markdown.markdown(post.body,
                                   extensions=[
                                       'markdown.extensions.extra',
