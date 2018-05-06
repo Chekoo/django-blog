@@ -4,12 +4,14 @@ from django.shortcuts import render, get_object_or_404
 from .models import Post, Category
 import markdown
 from comments.forms import CommentForm
+from django.views.generic import ListView
 
 # Create your views here.
 # 主页函数
-def index(request):
-    post_list = Post.objects.all().order_by('-created_time')
-    return render(request, 'blog/index.html', context={'post_list': post_list})
+class IndexView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
 
 # 详细页面函数
 def detail(request, pk):
