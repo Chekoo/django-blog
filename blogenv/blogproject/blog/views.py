@@ -103,7 +103,7 @@ class PostDetailView(DetailView):
     # 阅读量+1， 看做是detail视图函数的调用
     def get(self, request, *args, **kwargs):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
-        self.object.increase_view()
+        self.object.increase_views()
         return response
 
     # 对应detail视图函数中，根据文章ID获取文章，随后对post.body进行markdown渲染
