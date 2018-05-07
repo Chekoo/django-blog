@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import Post, Category
+from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
@@ -148,10 +148,6 @@ class PostDetailView(DetailView):
 
 # 归档页面函数
 class ArchivesView(IndexView):
-    model = Post
-    template_name = 'blog/index.html'
-    context_object_name = 'post_list'
-
     def get_queryset(self):
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
@@ -167,9 +163,6 @@ class ArchivesView(IndexView):
 
 # 分类页面函数
 class CategoryView(IndexView):
-    model = Post
-    template_name = 'blog/index.html'
-    context_object_name = 'post_list'
 # get_queryset默认获取指定模型的全部列表数据,覆写该方法，改变它默认行为
 # 根据URL中捕获的id(pk)获取分类，从URL捕获的命名组参数值保存在实例的kwargs(一个字典)属性里，非命名组参数保存在实例的args(一个列表)属性里
     def get_queryset(self):
@@ -181,3 +174,13 @@ class CategoryView(IndexView):
 #     cate = get_object_or_404(Category, pk=pk)
 #     post_list = Post.objects.filter(category=cate)
 #     return render(request, 'blog/index.html', context={'post_list': post_list})
+
+# 标签tag视图函数
+class TagView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
+
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs.get('pk'))
+        return super(TagView, self).get_queryset().filter(tags=tag)
