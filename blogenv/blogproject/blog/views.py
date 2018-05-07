@@ -163,6 +163,9 @@ class ArchivesView(IndexView):
 
 # 分类页面函数
 class CategoryView(IndexView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
 # get_queryset默认获取指定模型的全部列表数据,覆写该方法，改变它默认行为
 # 根据URL中捕获的id(pk)获取分类，从URL捕获的命名组参数值保存在实例的kwargs(一个字典)属性里，非命名组参数保存在实例的args(一个列表)属性里
     def get_queryset(self):
