@@ -5,6 +5,8 @@ from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
+from django.utils.text import slugify
+from markdown.extensions.toc import TocExtension
 
 # Create your views here.
 # 主页函数
@@ -107,12 +109,15 @@ class PostDetailView(DetailView):
         return response
 
     # 对应detail视图函数中，根据文章ID获取文章，随后对post.body进行markdown渲染
+    # 覆写get_object方法的目的是因为需要对post的body值进行渲染
+    # TocExtension在实例化时其slugify参数可以接受一个函数作为参数，
+    # 这个函数将被用于处理标题的锚点值
     def get_object(self, queryset=None):
         post = super(PostDetailView, self).get_object(queryset=None)
         md = markdown.Markdown(extensions=[
             'markdown.extensions.extra',
             'markdown.extensions.codehilite',
-            'markdown.extensions.toc',
+            TocExtension(slugify=slugify),
         ])
         post.body = md.convert(post.body)
         post.toc = md.toc
