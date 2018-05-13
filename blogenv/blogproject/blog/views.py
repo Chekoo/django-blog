@@ -109,12 +109,13 @@ class PostDetailView(DetailView):
     # 对应detail视图函数中，根据文章ID获取文章，随后对post.body进行markdown渲染
     def get_object(self, queryset=None):
         post = super(PostDetailView, self).get_object(queryset=None)
-        post.body = markdown.markdown(post.body,
-                                      extensions=[
-                                          'markdown.extensions.extra',
-                                          'markdown.extensions.codehilite',
-                                          'markdown.extensions.toc',
-                                      ])
+        md = markdown.Markdown(extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+            'markdown.extensionss.toc',
+        ])
+        post.body = md.convert(post.body)
+        post.toc = md.toc
         return post
 
     # 对应detail视图函数中生成评论表单，获取post下的评论列表的代码部分，返回一个字典。
