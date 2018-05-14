@@ -10,5 +10,4 @@ urlpatterns = [
     url(r'^category/(?P<pk>[0-9]+)/$', views.CategoryView.as_view(), name='category'),
     url(r'^tag/(?P<pk>[0-9]+)/$', views.TagView.as_view(), name='tag'),
     url(r'^all/rss/$', AllPostRssFeed(), name='rss'),
-    url(r'^search/$', views.search, name='search'),
 ]
