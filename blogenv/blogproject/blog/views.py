@@ -10,8 +10,8 @@ from markdown.extensions.toc import TocExtension
 from django.db.models import Q
 
 # Create your views here.
-# 主页函数
 
+# 主页函数
 class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
@@ -158,6 +158,8 @@ class ArchivesView(IndexView):
     def get_queryset(self):
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
+        # 注意这里 created_time 是 Python 的 date 对象，其有一个 year 和 month 属性，Python 中类实例调用属性的方法
+        # 通常是 created_time.year，但是由于这里作为函数的参数列表，所以 Django 要求我们把点替换成了两个下划线，即 created_time__year。
         return super(ArchivesView, self).get_queryset().filter(created_time__year = year,
                                                                created_time__month = month
                                                                )
